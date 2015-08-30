@@ -1,0 +1,73 @@
+function energy = actenergy(t,y,c,g)
+%ACTENERGY(t,y,c,g) возращает значение энергии активации в Дж на моль
+%где t значение температуры в градусах Кельвина
+%y значение велечены зависящей от температры
+%если с=0 то подгоняется формулой a*exp(b*x)используя линейный МНК
+%если g=1 то рисуется график срезультатами подгонки
+
+if(ne(size(t,2),1))
+    t=t';           %здесь данные приводятся к столбцу, если они были переданы
+end                 %в функцию в виде строки
+if(ne(size(y,2),1))
+    y=y';
+end
+invt=rdivide(1,t);
+figure;
+semilogy(invt,y,'rs');
+grid on;
+hold on;
+if eq(c,0)
+   ftype=fittype('exp1');
+   opts = fitoptions('Method','LinearLeastSquares')
+else
+  
+  but=1;
+  n=1;
+  [xi,yi,but] = ginput(1); %определение координат по первому щелчку мыши
+  xy(n,:) = [xi,yi];  
+  plot(xi,yi,'ro')        %рисуте точку куда щелкнули мышкой   
+  n = 2;
+  while but == 1
+    [xi,yi,but] = ginput(1); %определение координат по второму щечку мыши
+    xy(n,:) = [xi,yi] ;
+    hold off;  
+    semilogy(invt,y,'rs');
+    grid on;
+    hold on;  
+    nn=1:2;
+    plot(xy(nn,1),xy(nn,2),'ro')
+    ae=exp((xy(1,1)*log(xy(2,2))-xy(2,1)*log(xy(1,2)))/(xy(1,1)-xy(2,1)));
+    be=(log(xy(2,2))-log(xy(1,2)))/((xy(2,1)-xy(1,1)));
+    x=xy(1,1):(xy(2,1)-xy(1,1))/20:xy(2,1);
+    yy=ae*exp(be*x);
+    plot(x,yy,'r-'); %эти строки рисуют экспоненту по двум точкам введенными мышкой
+  end
+ 
+  if eq(c,1)
+     ftype=fittype('a*exp(-b*x)');
+     opts = fitoptions('Method','NonlinearLeastSquares','StartPoint',[ae -be],...
+         'Display','iter','TolFun',1e-60,'TolX',1e-120,'MaxFunEvals',10000,...
+         'DiffMinChange',10e-2,'DiffMinChange',10e5);
+  else
+     ftype=fittype('a*exp(-b*x)+c');
+     opts = fitoptions('Method','NonlinearLeastSquares','StartPoint',[ae -be 0],...
+           'Display','iter','TolFun',1e-19,'TolX',1e-12);
+  end
+end  
+mfit=fit(invt,y,ftype,opts);
+disp('Энергия активации равна');
+if eq(c,0) 
+    znak=-1;
+else
+    znak=1;
+end
+energy=mfit.b*8.314472*znak
+if ne(g,0)
+    if or(eq(c,0),eq(c,1))
+        plot(invt,y,'rs');
+        plot(mfit,'b--');
+    else
+        plot(invt,y-mfit.c,'rs',invt,mfit.a*exp(-mfit.b*invt))
+    end
+    grid on;
+end

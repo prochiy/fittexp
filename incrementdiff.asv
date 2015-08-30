@@ -1,0 +1,34 @@
+function incrementdiff(hObject,eventdata,handles,flag)
+%данная функция производит вычитание или  прибавление инкремента
+%(небольшой величины 1е-3) к диффузионному затуханию
+global DiffNMR;
+if ~strcmp(DiffNMR.Mode,'diff')
+    disp('В данном режиме нельзя производить эту опрацию')
+    beep
+    return
+end
+if DiffNMR.Step~=1
+    disp('Данную опацию можно проводить толь на первом шаге подгонки')
+    beep
+    return
+end
+
+inc=str2num(get(handles.edIncrement,'String'));
+
+if isempty(inc)
+    disp('Вы не ввели или ввели не правильный икремент')
+    beep
+    return
+end
+
+if strcmp(flag,'plus')
+    DiffNMR.Qdecay{1}(:,2)=DiffNMR.Qdecay{1}(:,2)+inc;
+elseif strcmp(flag,'minus')
+    DiffNMR.Qdecay{1}(:,2)=DiffNMR.Qdecay{1}(:,2)-inc;
+end
+handles.first=1;
+guidata(hObject,handles)
+plotdiff(hObject,[],handles,'first')
+if isfield(handles,'line')
+    if ishandl(ha)
+

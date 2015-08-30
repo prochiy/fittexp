@@ -1,0 +1,148 @@
+function fitdiff(hObject,eventdata,handles)
+%Данная функция выполняет подгонку экспонентами, начальные параметры
+%задаются щелчками мыши по графику
+global DiffNMR;
+if ~strcmp(DiffNMR.Mode,'diff')
+    disp('В данном режиме эта функция не работает')
+    beep;
+    return
+end
+for r=1:8
+    eval(['rb(' num2str(r) ')=get(handles.rb' num2str(r) ',' '''Value''' ');'])
+end
+
+multiexp=''; %Функция которой будет производится подгонка
+Nexp=0;      %Колличество экспнент в подгонке
+Nprob=0;     %Колличество фиксированных параметров
+Prob{1}='';  %Имена фиксированных параметров
+StartPoint=[];
+ProbPoint={};
+APoint=[];
+BPoint=[];
+SProbPoint='';
+SAPoint='';
+SBPoint='';
+Norm=DiffNMR.Qdecay{1}(ceil(DiffNMR.NPoints/2),1);
+for r=1:4
+    eval(['temp=get(handles.edCoef' num2str(r) ',' '''String''' ');'])
+    eval(['temp1=get(handles.edCoefDiff' num2str(r) ',' '''String''' ');'])
+    if (~isempty(str2num(temp)))&&(~isempty(str2num(temp1)))
+        p(r)=str2num(temp); %число в поле заселенности
+        d(r)=str2num(temp1); %число в поле коэффициента диффузии
+        Nexp=Nexp+1;
+        eval(['temp=' '''' 'A' num2str(r) '*exp(-B' num2str(r) '*x)' '''' ';' ])
+        if r==1
+            multiexp =temp;
+        else
+            multiexp=[multiexp '+' temp];
+        end
+        if rb(r)==1
+            Nprob=Nprob+1;
+            eval(['Prob{' num2str(Nprob) '}=' '''' 'A' num2str(r) '''' ';'])
+            ProbPoint{Nprob}=p(r);
+            SProbPoint=[SProbPoint 'PpobPoint{' num2str(Nprob) '},'];
+        else
+            APoint=[APoint p(r)];
+            SAPoint=[SAPoint 'APoint[' num2str(r) '],'];
+        end
+        if rb(r+4)==1
+            Nprob=Nprob+1;
+            eval(['Prob{' num2str(Nprob) '}=' '''' 'B' num2str(r) '''' ';'])
+            ProbPoint{Nprob}=d(r)*Norm;
+            SProbPoint=[SProbPoint 'PpobPoint{' num2str(Nprob) '},'];
+        else
+            BPoint=[BPoint d(r)*Norm];
+            SBPoint=[SBPoint 'BPoint[' num2str(r) '],'];
+        end    
+    end
+end
+
+SProbPoint
+SAPoint
+SBPoint
+multiexp
+SArg=[SAPoint SBPoint SProbPoint];
+SArg(end)=[];
+SArg
+
+%Norm=DiffNMR.Qdecay{1}(ceil(DiffNMR.NPoints/2),1);
+StartPoint=[APoint BPoint];
+
+fun=fittype(multiexp,'independent','x','problem',Prob)
+opt=fitoptions('Method','NonlinearLeastSquares');
+if get(handles.rbNo,'Value')
+    set(opt,'Weights',ones(DiffNMR.NPoints,1))
+elseif get(handles.rbN,'Value')
+    set(opt,'Weights',DiffNMR.DiffDecay(:,1))
+elseif get(handles.rbGrad,'Value')
+    ['fun(' SArg ',DiffNMR.Qdecay{1}(:,1)/Norm)']
+    eval(['fun(' SArg ',DiffNMR.Qdecay{1}(1,1)/Norm)'])
+    set(opt,'Weights',fun(eval(SArg),DiffNMR.Qdecay{1}(:,1)/Norm))
+end
+    set(opt,'Algorithm','Trust-Region')
+    set(opt,'Normalize','off')
+    set(opt,'StartPoint',StartPoint)
+    set(opt,'Lower',StartPoint/2)
+    set(opt,'Upper',StartPoint*2)
+    set(opt,'TolFun',1e-18)
+    set(opt,'TolX',1e-15)
+    set(opt,'DiffMinChange',1e-12)
+    set(opt,'DiffMaxChange',1e-2)
+    set(opt,'MaxFunEvals',400)
+    set(opt,'Robust','off')
+    set(opt,'Display','iter')
+    
+[fitresult,gof]=fit(DiffNMR.Qdecay{1}(:,1)./Norm,DiffNMR.Qdecay{1}(:,2),...
+        fun,opt,'problem',ProbPoint)
+%Заполнение полей результатами расчетов и сохранение коэффициентов в структуру DiiffNMR   
+for r=1:4
+    if r<=Nexp
+        if rb(r)~=1
+            eval(['temp=' 'fitresult.A' num2str(r) ';' ])
+            eval(['set(handles.edCoef' num2str(r) ',' '''String''' ',' '''' num2str(temp) '''' ')'])
+            DiffNMR.Population(r)=temp;
+        else
+            eval(['temp=get(handles.edCoef' num2str(r) ',' '''String''' ');'])
+            DiffNMR.Population(r)=str2double(temp);
+        end
+        if rb(r+4)~=1
+            eval(['temp=' 'fitresult.B' num2str(r) './' num2str(Norm) ';' ])
+            eval(['set(handles.edCoefDiff' num2str(r) ',' '''String''' ',' '''' num2str(temp) '''' ')'])
+            DiffNMR.CoefDiff(r)=temp;
+        else
+            eval(['temp=get(handles.edCoefDiff' num2str(r) ',' '''String''' ');'])
+            DiffNMR.CoefDiff(r)=str2double(temp);
+        end
+    else 
+        %if exist(DiffNMR.Population(r))
+        %    DiffNMR.Population(r)=[];
+        %end
+        %if exist(DiffNMR.CoefDiff(r))
+        %    DiffNMR.CoefDiff(r)=[];
+        %end
+    end
+end
+
+%Вывод результатов подгонки на график
+fittexp('mShowFittingResult_Callback',gcbo,[],guidata(gcbo))
+
+%блок отоборажает разницн между эеспереметральными точками и
+%и суммой подгоночных экспонент
+
+set(gcf,'CurrentAxes',handles.axes2)
+cla;
+for ik=1:DiffNMR.NPoints
+    yd=DiffNMR.Qdecay{1}(:,2)-fitresult(DiffNMR.Qdecay{1}(:,1)./Norm);
+    if strcmp(get(handles.axes2,'YScale'),'log')
+        if gt(DiffNMR.Qdecay{DiffNMR.Step+1}(ik,2),0)
+            handles.differens2=plot(DiffNMR.Qdecay{1}(ik,1),yd(ik),'*b');
+        else
+            handles.differens2=plot(DiffNMR.Qdecay{1}(ik,1),-yd(ik),'*r');
+        end
+    else
+        handles.differens2=plot(DiffNMR.Qdecay{1}(ik,1),yd(ik),'*b');
+    end
+end
+guidata(hObject,handles)
+set(gcf,'CurrentAxes',DiffNMR.MainAxes)
+

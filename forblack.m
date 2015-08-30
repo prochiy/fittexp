@@ -1,0 +1,32 @@
+function x = forblack()
+global QmatNMR;
+QmatNMR.uiInput3
+eval(['global ' QmatNMR.uiInput3])
+fid=fopen([QmatNMR.DataPath2D filesep '..' filesep '..' filesep 'vdlist']);
+i=0;
+tline=[];
+while 1
+    i=i+1
+    tline = fgetl(fid);
+    tline(end)=[];
+    if ~ischar(tline), break, end
+    delay(i)=str2num(tline)    
+end
+fclose(fid);
+%delay
+%figure
+i=length(delay);
+eval(['ampl=' QmatNMR.uiInput3 ';'])
+%plot(delay,ampl(:,2),'*')
+%ampl1=ampl(end,2)-ampl(:,2);
+try
+  % Contrary to peakfit for T1 the whole 1D vector is overloaded to the T1 fitting routine !!
+  
+  T1lsq(delay',ampl(1:i,2));	%take the 1D spectrum
+
+catch
+%
+%call the generic error handler routine if anything goes wrong
+%
+  errorhandler
+end
