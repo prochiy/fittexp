@@ -57,7 +57,7 @@ function fittexp_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for fittexp
 handles.output = hObject;
 
-%иницизация переменных
+%пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 global DiffNMR;
 evalin('base','global DiffNMR;');
 DiffNMR.MainFigure=gcf;
@@ -75,7 +75,7 @@ handles.LineShift=0;
 set(gcf,'CurrentAxes',handles.axes1);
 DiffNMR.MainAxes = gca;
 
-%Создание контекстного меню для удаления точек графика
+%пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 handles.cmenu = uicontextmenu;
 handles.item1 = uimenu(handles.cmenu, 'Label', 'delete', 'Callback','deletediff(gcbo,[])');
 
@@ -156,7 +156,7 @@ if strcmp(DiffNMR.Mode,'diff')
         guidata(hObject,handles)
         plotdiff(hObject,[],handles,'first');
     else
-        disp('Все приехали, больше четырех вычитаний делать нельзя')
+        disp('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ')
         beep
     end
 elseif strcmp(DiffNMR.Mode,'spec')
@@ -265,7 +265,7 @@ function axes2_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: place code in OpeningFcn to populate axes2
-%guidata(gcbo,handles); % сохраняет структуру handles
+%guidata(gcbo,handles); % пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ handles
 
 
 
@@ -301,7 +301,7 @@ function tgZoom_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of tgZoom
 global DiffNMR;
-%следующие строки сменяют вид курсора
+%пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 if get(handles.tgZoom,'Value')
     set(DiffNMR.MainFigure,'Pointer','fullcross')
 else
@@ -374,8 +374,8 @@ function axes1_CreateFcn(hObject, eventdata, handles)
 % Hint: place code in OpeningFcn to populate axes1
 global DiffNMR;
 DiffNMR.MainAxes=gca;
-DiffNMR.InitialAxisXLim=get(DiffNMR.MainAxes,'XLim'); %это по умолчанию, так же эти величины определяются
-DiffNMR.InitialAxisYLim=get(DiffNMR.MainAxes,'YLim'); %при построении графика после чтения из файла
+DiffNMR.InitialAxisXLim=get(DiffNMR.MainAxes,'XLim'); %пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+DiffNMR.InitialAxisYLim=get(DiffNMR.MainAxes,'YLim'); %пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 %guidata(hObject,handles);
 
 
@@ -411,7 +411,7 @@ if strcmp(DiffNMR.Mode,'diff')
         guidata(hObject,handles);
         plotdiff(hObject,[],handles,'first')
     else
-        disp('Все назад дальше некуда')
+        disp('пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ')
     end
 elseif strcmp(DiffNMR.Mode,'spec')
     plotspecdiff(gcbo,[],guidata(gcbo),'back')
@@ -457,10 +457,10 @@ function mOpenFile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global DiffNMR;
-readdiff; %чтение данный из фала обработки диффузионного затухания
+readdiff; %пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-set(handles.edCoefDiff1,'String','CoefDiff'); %этот блок отвечает за 
-set(handles.edCoef1,'String','coef');      %обнуление полей данных 
+set(handles.edCoefDiff1,'String','CoefDiff'); %пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 
+set(handles.edCoef1,'String','coef');      %пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 set(handles.edCoefDiff2,'String','CoefDiff');
 set(handles.edCoef2,'String','coef');
 set(handles.edCoefDiff3,'String','CoefDiff');
@@ -470,8 +470,8 @@ set(handles.edCoef4,'String','coef');
 
 
 
-%Нижеследующий код производит заполнение полей edit данными считанными из
-%файла оброботки диффузиноного затухания.
+%пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ edit пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ
+%пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 set(handles.edBigdelta,'String',num2str(DiffNMR.BigDelta*1e+3));
 set(handles.edLittledelta,'String',num2str(DiffNMR.LittleDelta*1e+3));
 switch DiffNMR.Gamma;   %Hz/G
@@ -804,8 +804,8 @@ DiffNMR.Step=1;
 handles.first=1;
 guidata(hObject,handles)
 plotdiff(hObject,[],handles,'first')
-set(handles.edCoefDiff1,'String','CoefDiff'); %этот блок отвечает за 
-set(handles.edCoef1,'String','coef');      %обнуление полей данных 
+set(handles.edCoefDiff1,'String','CoefDiff'); %пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 
+set(handles.edCoef1,'String','coef');      %пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 
 set(handles.edCoefDiff2,'String','CoefDiff');
 set(handles.edCoef2,'String','coef');
 set(handles.edCoefDiff3,'String','CoefDiff');
